@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mohzzzz — script hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #000;
+  --bg1: #080808;
+  --bg2: #111;
+  --bg3: #181818;
+  --border: #1e1e1e;
+  --border2: #2a2a2a;
+  --text: #d4d4d4;
+  --dim: #555;
+  --dim2: #333;
+  --white: #fff;
+  --green: #3ca35c;
+  --red: #c0392b;
+  --orange: #e67e22;
+  --accent: #888;
+  --font: 'JetBrains Mono', monospace;
+  --display: 'Syne', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  min-height: 100vh;
+}
+
+/* GRAIN */
+body::after {
+  content:''; position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:9999; opacity:.35;
+}
+
+/* NAV */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 40px;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-size:14px; font-weight:700; color:var(--white); letter-spacing:.04em;
+}
+.nav-logo span { color:var(--dim); font-weight:400; }
+.nav-tabs { display:flex; gap:4px; }
+.nav-tab {
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  padding:7px 14px; border-radius:6px; cursor:pointer;
+  background:transparent; border:1px solid transparent;
+  color:var(--dim); transition:all .2s;
+}
+.nav-tab:hover { color:var(--text); border-color:var(--border2); }
+.nav-tab.active { color:var(--white); background:var(--bg3); border-color:var(--border2); }
+.nav-right { display:flex; align-items:center; gap:12px; }
+#adminBadge {
+  display:none; font-size:9px; padding:3px 8px; border-radius:4px;
+  background: rgba(60,163,92,.15); color:var(--green);
+  border:1px solid rgba(60,163,92,.3); letter-spacing:.1em;
+  font-family:'JetBrains Mono',monospace; font-weight:600;
+}
+#uidDisplay { font-size:8px; color:var(--dim2); font-family:'JetBrains Mono',monospace; }
+
+/* LAYOUT */
+.page { display:none; padding:90px 40px 60px; max-width:1100px; margin:0 auto; }
+.page.active { display:block; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom:40px; }
+.page-tag { font-size:10px; color:var(--dim); letter-spacing:.2em; text-transform:uppercase; margin-bottom:10px; }
+.page-title {
+  font-family:'Syne',sans-serif; font-size:clamp(32px,5vw,56px);
+  font-weight:800; color:var(--white); letter-spacing:-.03em; line-height:1;
+}
+.page-sub { margin-top:10px; font-size:11px; color:var(--dim); line-height:1.8; }
+
+/* GRID */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.grid-3 { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px; }
+@media(max-width:768px) {
+  .grid-2 { grid-template-columns:1fr; }
+  .grid-3 { grid-template-columns:1fr; }
+  .page { padding:80px 20px 40px; }
+  nav { padding:14px 16px; }
+  .nav-tabs { flex-wrap:wrap; gap:2px; }
+  .nav-logo { font-size:12px; }
+}
+
+/* CARD */
+.card {
+  background:var(--bg1); border:1px solid var(--border);
+  border-radius:12px; padding:24px;
+}
+.card-title { font-size:10px; color:var(--dim); letter-spacing:.15em; text-transform:uppercase; margin-bottom:16px; }
+
+/* FORM */
+.form-group { margin-bottom:12px; }
+.form-label { font-size:9px; color:var(--dim); letter-spacing:.12em; text-transform:uppercase; display:block; margin-bottom:6px; }
+.form-input, .form-textarea, .form-select {
+  width:100%; background:var(--bg2); border:1px solid var(--border2);
+  border-radius:6px; padding:10px 12px;
+  font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--white);
+  outline:none; transition:border-color .2s;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus { border-color:var(--accent); }
+.form-textarea { resize:vertical; min-height:70px; }
+.form-input::placeholder, .form-textarea::placeholder { color:var(--dim2); }
+.form-select { cursor:pointer; -webkit-appearance:none; appearance:none; }
+
+/* BUTTONS */
+.btn {
+  font-family:'JetBrains Mono',monospace; font-size:10px;
+  font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  padding:10px 20px; border-radius:6px; cursor:pointer;
+  border:1px solid var(--border2); background:var(--bg3);
+  color:var(--text); transition:all .15s; display:inline-block;
+}
+.btn:hover { background:var(--bg2); color:var(--white); border-color:var(--accent); }
+.btn:disabled { opacity:.4; cursor:not-allowed; }
+.btn-primary { background:var(--white); color:#000; border-color:var(--white); }
+.btn-primary:hover { background:#ddd; border-color:#ddd; }
+.btn-green { background:var(--green); color:#fff; border-color:var(--green); }
+.btn-green:hover { background:#2e8a4a; }
+.btn-red { background:var(--red); color:#fff; border-color:var(--red); }
+.btn-red:hover { background:#a93226; }
+.btn-sm {
+  font-size:9px; padding:5px 12px; letter-spacing:.08em;
+}
+
+/* SMALL BTNS */
+.small-btn {
+  font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:600;
+  padding:4px 10px; border-radius:4px; cursor:pointer;
+  border:1px solid var(--border2); background:var(--bg3); color:var(--text);
+  transition:all .15s; letter-spacing:.06em; text-transform:uppercase;
+}
+.small-btn:hover { border-color:var(--accent); color:var(--white); }
+.small-btn.green { color:var(--green); border-color:rgba(60,163,92,.3); }
+.small-btn.green:hover { background:var(--green); color:#fff; }
+.small-btn.red { color:var(--red); border-color:rgba(192,57,43,.3); }
+.small-btn.red:hover { background:var(--red); color:#fff; }
+
+/* SCRIPT CARDS */
+.script-card {
+  background:var(--bg1); border:1px solid var(--border);
+  border-radius:10px; padding:20px; transition:border-color .2s;
+}
+.script-card:hover { border-color:var(--border2); }
+.script-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+.script-card-name { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--white); }
+.script-card-game { font-size:10px; color:var(--dim); margin-top:3px; letter-spacing:.05em; }
+.badge {
+  font-size:8px; padding:3px 8px; border-radius:4px;
+  letter-spacing:.1em; font-weight:600; text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace; white-space:nowrap;
+}
+.badge-keyless { background:rgba(60,163,92,.12); color:var(--green); border:1px solid rgba(60,163,92,.25); }
+.badge-keyed { background:rgba(230,126,34,.12); color:var(--orange); border:1px solid rgba(230,126,34,.25); }
+
+.code-block {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:6px; padding:12px; margin-top:12px;
+  font-family:'JetBrains Mono',monospace; font-size:10px;
+  color:var(--green); line-height:1.8; word-break:break-all;
+  white-space:pre-wrap; position:relative;
+}
+.code-block .copy-code-btn {
+  position:absolute; top:8px; right:8px;
+  font-family:'JetBrains Mono',monospace; font-size:8px; font-weight:600;
+  padding:3px 8px; border-radius:4px; cursor:pointer;
+  border:1px solid var(--border2); background:var(--bg3); color:var(--dim);
+  transition:all .15s; letter-spacing:.06em; text-transform:uppercase;
+}
+.code-block .copy-code-btn:hover { border-color:var(--accent); color:var(--white); }
+
+.keyed-msg {
+  font-size:10px; color:var(--dim); margin-top:12px;
+  padding:10px 12px; background:var(--bg2); border:1px solid var(--border);
+  border-radius:6px; line-height:1.6;
+}
+
+/* REDEEM */
+.redeem-result {
+  margin-top:20px; padding:20px; background:var(--bg1);
+  border:1px solid var(--border); border-radius:10px;
+}
+.redeem-status {
+  font-size:10px; padding:8px 12px; border-radius:6px;
+  margin-bottom:14px; letter-spacing:.08em;
+  border:1px solid var(--border);
+}
+.redeem-status.waiting { color:var(--dim); background:var(--bg2); }
+.redeem-status.ready { color:var(--green); background:rgba(60,163,92,.06); border-color:rgba(60,163,92,.25); }
+.redeem-status.error { color:var(--red); background:rgba(192,57,43,.06); border-color:rgba(192,57,43,.25); }
+.redeem-script-name { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color:var(--white); margin-bottom:6px; }
+.redeem-script-game { font-size:10px; color:var(--dim); margin-bottom:12px; }
+
+/* ADMIN SUB-TABS */
+.admin-subtabs { display:flex; gap:4px; margin-bottom:24px; }
+.admin-subtab {
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  padding:7px 14px; border-radius:6px; cursor:pointer;
+  background:transparent; border:1px solid transparent;
+  color:var(--dim); transition:all .2s;
+}
+.admin-subtab:hover { color:var(--text); border-color:var(--border2); }
+.admin-subtab.active { color:var(--white); background:var(--bg3); border-color:var(--border2); }
+.admin-sub-page { display:none; }
+.admin-sub-page.active { display:block; }
+
+/* ADMIN SCRIPT LIST */
+.admin-script-item {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:8px; padding:14px; margin-bottom:10px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.admin-script-item:hover { border-color:var(--border2); }
+.admin-script-info { flex:1; }
+.admin-script-name { font-size:12px; color:var(--white); font-weight:600; }
+.admin-script-game { font-size:10px; color:var(--dim); margin-top:2px; }
+.admin-script-actions { display:flex; gap:6px; }
+
+/* ADMIN KEY LIST */
+.admin-key-item {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:8px; padding:14px; margin-bottom:10px;
+}
+.admin-key-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+.admin-key-value { font-size:11px; color:var(--white); font-weight:600; letter-spacing:.04em; }
+.admin-key-meta { font-size:9px; color:var(--dim); margin-top:3px; line-height:1.8; }
+.admin-key-meta span { color:var(--text); }
+.key-status-badge {
+  font-size:8px; padding:3px 8px; border-radius:4px;
+  letter-spacing:.08em; font-weight:600; text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;
+}
+.key-active { background:rgba(60,163,92,.12); color:var(--green); border:1px solid rgba(60,163,92,.25); }
+.key-expired { background:rgba(192,57,43,.12); color:var(--red); border:1px solid rgba(192,57,43,.25); }
+.key-used { background:rgba(136,136,136,.12); color:var(--accent); border:1px solid rgba(136,136,136,.2); }
+
+/* GENERATED KEYS LIST */
+.generated-keys-box {
+  background:var(--bg2); border:1px solid rgba(60,163,92,.2);
+  border-radius:8px; padding:16px; margin-top:16px; margin-bottom:20px;
+}
+.generated-key-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:6px 0; border-bottom:1px solid var(--border);
+}
+.generated-key-row:last-child { border-bottom:none; }
+.generated-key-val { font-size:10px; color:var(--green); letter-spacing:.04em; }
+
+/* MODAL OVERLAY */
+.modal-overlay {
+  display:none; position:fixed; inset:0; z-index:200;
+  background:rgba(0,0,0,.8); backdrop-filter:blur(8px);
+  justify-content:center; align-items:center; padding:20px;
+}
+.modal-overlay.active { display:flex; }
+.modal {
+  background:var(--bg1); border:1px solid var(--border);
+  border-radius:12px; padding:28px; width:100%; max-width:560px;
+  max-height:90vh; overflow-y:auto;
+}
+.modal-title {
+  font-family:'Syne',sans-serif; font-size:20px; font-weight:800;
+  color:var(--white); margin-bottom:20px;
+}
+.modal-close {
+  float:right; background:transparent; border:none;
+  color:var(--dim); font-size:18px; cursor:pointer;
+  transition:color .15s; font-family:'JetBrains Mono',monospace;
+}
+.modal-close:hover { color:var(--white); }
+
+/* CODE TEXTAREA */
+.code-textarea {
+  width:100%; background:#0a0f0a; border:1px solid rgba(60,163,92,.2);
+  border-radius:6px; padding:14px;
+  font-family:'JetBrains Mono',monospace; font-size:11px;
+  color:var(--green); line-height:1.7;
+  outline:none; resize:vertical; min-height:400px; max-height:80vh;
+  transition:border-color .2s;
+  overflow-y:auto; white-space:pre; overflow-wrap:normal;
+}
+.code-textarea:focus { border-color:rgba(60,163,92,.5); }
+.code-textarea::placeholder { color:rgba(60,163,92,.3); }
+
+/* TOGGLE */
+.toggle-wrap { display:flex; align-items:center; gap:10px; }
+.toggle-label { font-size:10px; color:var(--dim); letter-spacing:.08em; text-transform:uppercase; }
+.toggle {
+  position:relative; width:36px; height:20px; cursor:pointer;
+}
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-slider {
+  position:absolute; inset:0; background:var(--bg2); border:1px solid var(--border2);
+  border-radius:10px; transition:all .2s;
+}
+.toggle-slider::before {
+  content:''; position:absolute; top:3px; left:3px;
+  width:12px; height:12px; border-radius:50%;
+  background:var(--dim); transition:all .2s;
+}
+.toggle input:checked + .toggle-slider { background:rgba(60,163,92,.15); border-color:rgba(60,163,92,.3); }
+.toggle input:checked + .toggle-slider::before { transform:translateX(16px); background:var(--green); }
+
+/* EMPTY STATE */
+.empty-state { font-size:10px; color:var(--dim2); padding:24px; text-align:center; }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:24px; right:24px;
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:8px; padding:12px 18px;
+  font-size:11px; color:var(--text); font-family:'JetBrains Mono',monospace;
+  z-index:9998; transform:translateY(20px); opacity:0;
+  transition:all .3s; pointer-events:none;
+}
+.toast.show { transform:translateY(0); opacity:1; }
+.toast.success { border-color:rgba(60,163,92,.4); color:var(--green); }
+.toast.error { border-color:rgba(192,57,43,.4); color:var(--red); }
+
+/* FOOTER */
+.site-footer {
+  text-align:center; padding:40px 20px 30px;
+  font-size:9px; color:var(--dim2); letter-spacing:.1em;
+}
+
+/* FADE IN */
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.fade-in { animation:fadeUp .4s ease forwards; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+/* ADMIN PANEL INFO */
+.admin-panel {
+  background:rgba(60,163,92,.04); border:1px solid rgba(60,163,92,.15);
+  border-radius:10px; padding:16px; margin-bottom:20px;
+}
+.admin-panel-title { font-size:9px; color:var(--green); letter-spacing:.15em; text-transform:uppercase; margin-bottom:8px; }
+
+/* DIVIDER */
+.divider { height:1px; background:var(--border); margin:20px 0; }
+</style>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, getDoc, setDoc, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAF7I0OFqd3nuWicvx4N_lHOKx-58WsNu8",
+    authDomain: "mohzzzz-hub.firebaseapp.com",
+    projectId: "mohzzzz-hub",
+    storageBucket: "mohzzzz-hub.firebasestorage.app",
+    messagingSenderId: "316118504192",
+    appId: "1:316118504192:web:f6c390a53b29988a12d9e5",
+    measurementId: "G-8TT49YN1D9"
+  };
+
+  const ADMIN_UID = "6wPB7GNRdufaWXvxTxTcL0Zkj7l1";
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  let currentUser = null;
+  let isAdmin = false;
+  let scriptsCache = [];
+
+  // ===================== UTILITIES =====================
+  function escHtml(str) {
+    if (!str) return "";
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  function showToast(msg, type) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = "toast show " + (type || "");
+    setTimeout(() => t.className = "toast", 3000);
+  }
+  window.showToast = showToast;
+
+  function copyToClipboard(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = "✓ COPIED";
+      btn.style.borderColor = "rgba(60,163,92,.5)";
+      btn.style.color = "#3ca35c";
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style.borderColor = "";
+        btn.style.color = "";
+      }, 1500);
+    }).catch(() => {
+      showToast("Failed to copy", "error");
+    });
+  }
+  window.copyToClipboard = copyToClipboard;
+
+  function generateRandomKey(prefix) {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const seg = () => {
+      let s = "";
+      for (let i = 0; i < 4; i++) s += chars[Math.floor(Math.random() * chars.length)];
+      return s;
+    };
+    return (prefix ? prefix.toUpperCase() + "-" : "") + seg() + "-" + seg() + "-" + seg();
+  }
+
+  function getBaseUrl() {
+    return window.location.origin;
+  }
+
+  // ===================== AUTH =====================
+  signInAnonymously(auth).catch(e => console.error("Auth error:", e));
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      currentUser = user;
+      isAdmin = (user.uid === ADMIN_UID);
+      window._isAdmin = isAdmin;
+      window._uid = user.uid;
+
+      // Show/hide admin elements
+      document.querySelectorAll(".admin-only").forEach(el => {
+        el.style.display = isAdmin ? "" : "none";
+      });
+      if (isAdmin) {
+        document.getElementById("adminBadge").style.display = "inline-block";
+        document.getElementById("uidDisplay").textContent = "UID: " + user.uid;
+        document.getElementById("navTabAdmin").style.display = "";
+        loadAdminScripts();
+        loadAdminKeys();
+      } else {
+        document.getElementById("navTabAdmin").style.display = "none";
+      }
+    }
+  });
+
+  // ===================== TAB SWITCHING =====================
+  function showTab(tabName) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+    const page = document.getElementById("page-" + tabName);
+    if (page) page.classList.add("active");
+    const tab = document.querySelector(`[data-tab="${tabName}"]`);
+    if (tab) tab.classList.add("active");
+  }
+  window.showTab = showTab;
+
+  // ===================== PUBLIC SCRIPTS =====================
+  function loadPublicScripts() {
+    const q = query(collection(db, "scripts"), orderBy("createdAt", "desc"));
+    onSnapshot(q, snapshot => {
+      const container = document.getElementById("scriptsGrid");
+      container.innerHTML = "";
+      scriptsCache = [];
+
+      if (snapshot.empty) {
+        container.innerHTML = '<div class="empty-state">// no scripts available yet</div>';
+        return;
+      }
+
+      snapshot.forEach(docSnap => {
+        const d = docSnap.data();
+        d._id = docSnap.id;
+        scriptsCache.push(d);
+        container.appendChild(makeScriptCard(docSnap.id, d));
+      });
+
+      // Also update admin script dropdown if admin
+      if (isAdmin) updateScriptDropdown();
+    });
+  }
+
+  function makeScriptCard(id, d) {
+    const card = document.createElement("div");
+    card.className = "script-card fade-in";
+    const isKeyless = d.keyless === true;
+    const baseUrl = getBaseUrl();
+    const loadstringCode = `loadstring(game:HttpGet("${baseUrl}/api/serve?id=${id}"))()`;
+
+    let codeHtml = "";
+    if (isKeyless) {
+      codeHtml = `
+        <div class="code-block">
+          <button class="copy-code-btn" onclick="window.copyToClipboard(\`${escHtml(loadstringCode)}\`, this)">COPY</button>
+          <span>${escHtml(loadstringCode)}</span>
+        </div>
+      `;
+    } else {
+      codeHtml = `
+        <div class="keyed-msg">🔑 This script requires a key. Enter your key in the <strong style="color:var(--white)">REDEEM</strong> section to get the loadstring.</div>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="script-card-header">
+        <div>
+          <div class="script-card-name">${escHtml(d.name)}</div>
+          <div class="script-card-game">${escHtml(d.game || "Unknown game")}</div>
+        </div>
+        <span class="badge ${isKeyless ? 'badge-keyless' : 'badge-keyed'}">${isKeyless ? 'KEYLESS' : 'KEY REQUIRED'}</span>
+      </div>
+      ${codeHtml}
+    `;
+    return card;
+  }
+
+  // ===================== REDEEM =====================
+  window.validateKey = async function() {
+    const keyInput = document.getElementById("redeemKeyInput").value.trim();
+    const resultDiv = document.getElementById("redeemResult");
+    const statusDiv = document.getElementById("redeemStatus");
+    const btn = document.getElementById("redeemBtn");
+
+    if (!keyInput) {
+      showToast("Please enter a key", "error");
+      return;
+    }
+
+    btn.textContent = "...";
+    btn.disabled = true;
+
+    try {
+      const q = query(collection(db, "keys"), where("key", "==", keyInput));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        statusDiv.className = "redeem-status error";
+        statusDiv.textContent = "✕ Invalid key — not found";
+        resultDiv.innerHTML = "";
+        btn.textContent = "VALIDATE";
+        btn.disabled = false;
+        return;
+      }
+
+      const keyDoc = snapshot.docs[0];
+      const keyData = keyDoc.data();
+
+      // Check expiry
+      if (keyData.expiresAt) {
+        const expiryDate = keyData.expiresAt.toDate ? keyData.expiresAt.toDate() : new Date(keyData.expiresAt);
+        if (expiryDate < new Date()) {
+          statusDiv.className = "redeem-status error";
+          statusDiv.textContent = "✕ This key has expired";
+          resultDiv.innerHTML = "";
+          btn.textContent = "VALIDATE";
+          btn.disabled = false;
+          return;
+        }
+      }
+
+      // Check max uses
+      if (keyData.maxUses > 0 && keyData.uses >= keyData.maxUses) {
+        statusDiv.className = "redeem-status error";
+        statusDiv.textContent = "✕ This key has reached its maximum uses";
+        resultDiv.innerHTML = "";
+        btn.textContent = "VALIDATE";
+        btn.disabled = false;
+        return;
+      }
+
+      // Check if script still exists
+      const scriptRef = doc(db, "scripts", keyData.scriptId);
+      const scriptSnap = await getDoc(scriptRef);
+      if (!scriptSnap.exists()) {
+        statusDiv.className = "redeem-status error";
+        statusDiv.textContent = "✕ The script linked to this key no longer exists";
+        resultDiv.innerHTML = "";
+        btn.textContent = "VALIDATE";
+        btn.disabled = false;
+        return;
+      }
+
+      const scriptData = scriptSnap.data();
+      const baseUrl = getBaseUrl();
+      const loadstringCode = `loadstring(game:HttpGet("${baseUrl}/api/serve?id=${keyData.scriptId}&key=${keyInput}"))()`;
+
+      // Increment uses
+      await updateDoc(doc(db, "keys", keyDoc.id), {
+        uses: (keyData.uses || 0) + 1
+      });
+
+      statusDiv.className = "redeem-status ready";
+      statusDiv.textContent = "✓ Key validated — copy the loadstring below";
+
+      resultDiv.innerHTML = `
+        <div class="redeem-result fade-in">
+          <div class="redeem-script-name">${escHtml(scriptData.name || keyData.scriptName)}</div>
+          <div class="redeem-script-game">${escHtml(scriptData.game || "")}</div>
+          <div class="code-block">
+            <button class="copy-code-btn" onclick="window.copyToClipboard(\`${escHtml(loadstringCode)}\`, this)">COPY</button>
+            <span style="color:var(--green)">${escHtml(loadstringCode)}</span>
+          </div>
+        </div>
+      `;
+
+    } catch(e) {
+      console.error(e);
+      statusDiv.className = "redeem-status error";
+      statusDiv.textContent = "✕ Error: " + e.message;
+      resultDiv.innerHTML = "";
+    }
+
+    btn.textContent = "VALIDATE";
+    btn.disabled = false;
+  };
+
+  // ===================== ADMIN: SCRIPTS =====================
+  let adminScriptsUnsub = null;
+
+  function loadAdminScripts() {
+    if (adminScriptsUnsub) return;
+    const q = query(collection(db, "scripts"), orderBy("createdAt", "desc"));
+    adminScriptsUnsub = onSnapshot(q, snapshot => {
+      const container = document.getElementById("adminScriptsList");
+      container.innerHTML = "";
+
+      if (snapshot.empty) {
+        container.innerHTML = '<div class="empty-state">// no scripts yet — add one above</div>';
+        return;
+      }
+
+      snapshot.forEach(docSnap => {
+        const d = docSnap.data();
+        container.appendChild(makeAdminScriptItem(docSnap.id, d));
+      });
+    });
+  }
+
+  function makeAdminScriptItem(id, d) {
+    const el = document.createElement("div");
+    el.className = "admin-script-item fade-in";
+    const isKeyless = d.keyless === true;
+    el.innerHTML = `
+      <div class="admin-script-info">
+        <div class="admin-script-name">${escHtml(d.name)} <span class="badge ${isKeyless ? 'badge-keyless' : 'badge-keyed'}" style="margin-left:8px;">${isKeyless ? 'KEYLESS' : 'KEY'}</span> <span class="badge" style="background:rgba(139,92,246,.15);color:#a78bfa;margin-left:4px;">🔒 OBFUSCATED</span></div>
+        <div class="admin-script-game">${escHtml(d.game || "—")}</div>
+      </div>
+      <div class="admin-script-actions">
+        <button class="small-btn" style="color:#a78bfa;border-color:rgba(139,92,246,.3);" onclick="window.previewObfuscated('${id}')">PREVIEW OBF</button>
+        <button class="small-btn" onclick="window.editScript('${id}')">EDIT</button>
+        <button class="small-btn red" onclick="window.deleteScript('${id}')">DELETE</button>
+      </div>
+    `;
+    return el;
+  }
+
+  window.showScriptModal = function(editId) {
+    const overlay = document.getElementById("scriptModalOverlay");
+    const title = document.getElementById("scriptModalTitle");
+    const nameInput = document.getElementById("scriptNameInput");
+    const gameInput = document.getElementById("scriptGameInput");
+    const codeInput = document.getElementById("scriptCodeInput");
+    const keylessToggle = document.getElementById("scriptKeylessToggle");
+    const saveBtn = document.getElementById("scriptSaveBtn");
+
+    if (editId) {
+      title.textContent = "Edit Script";
+      saveBtn.textContent = "UPDATE SCRIPT";
+      saveBtn.setAttribute("data-edit-id", editId);
+
+      // Load metadata from scripts
+      getDoc(doc(db, "scripts", editId)).then(snap => {
+        if (snap.exists()) {
+          const d = snap.data();
+          nameInput.value = d.name || "";
+          gameInput.value = d.game || "";
+          keylessToggle.checked = d.keyless === true;
+        }
+      });
+      // Load code from protected script_code collection
+      getDoc(doc(db, "script_code", editId)).then(snap => {
+        if (snap.exists()) {
+          codeInput.value = snap.data().code || "";
+        }
+      });
+    } else {
+      title.textContent = "Add Script";
+      saveBtn.textContent = "ADD SCRIPT";
+      saveBtn.removeAttribute("data-edit-id");
+      nameInput.value = "";
+      gameInput.value = "";
+      codeInput.value = "";
+      keylessToggle.checked = false;
+    }
+
+    overlay.classList.add("active");
+  };
+
+  window.closeScriptModal = function() {
+    document.getElementById("scriptModalOverlay").classList.remove("active");
+  };
+
+  window.editScript = function(id) {
+    window.showScriptModal(id);
+  };
+
+  window.saveScript = async function() {
+    const nameInput = document.getElementById("scriptNameInput");
+    const gameInput = document.getElementById("scriptGameInput");
+    const codeInput = document.getElementById("scriptCodeInput");
+    const keylessToggle = document.getElementById("scriptKeylessToggle");
+    const saveBtn = document.getElementById("scriptSaveBtn");
+
+    const name = nameInput.value.trim();
+    const game = gameInput.value.trim();
+    const code = codeInput.value.trim();
+    const keyless = keylessToggle.checked;
+
+    if (!name) { showToast("Script name is required", "error"); return; }
+    if (!code) { showToast("Script code is required", "error"); return; }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = "...";
+
+    const editId = saveBtn.getAttribute("data-edit-id");
+
+    try {
+      if (editId) {
+        // Save metadata to scripts, code to script_code (protected)
+        await updateDoc(doc(db, "scripts", editId), { name, game, keyless });
+        await setDoc(doc(db, "script_code", editId), { code });
+        showToast("Script updated!", "success");
+      } else {
+        // Create script metadata first (no code here!)
+        const newRef = await addDoc(collection(db, "scripts"), {
+          name, game, keyless,
+          createdAt: serverTimestamp()
+        });
+        // Store code separately in protected collection
+        await setDoc(doc(db, "script_code", newRef.id), { code });
+        showToast("Script added!", "success");
+      }
+      window.closeScriptModal();
+    } catch(e) {
+      showToast("Error: " + e.message, "error");
+    }
+
+    saveBtn.disabled = false;
+    saveBtn.textContent = editId ? "UPDATE SCRIPT" : "ADD SCRIPT";
+  };
+
+  window.deleteScript = async function(id) {
+    if (!confirm("Delete this script? This cannot be undone.")) return;
+    try {
+      await deleteDoc(doc(db, "scripts", id));
+      await deleteDoc(doc(db, "script_code", id));
+      showToast("Script deleted", "success");
+    } catch(e) {
+      showToast("Error: " + e.message, "error");
+    }
+  };
+
+  // ===================== OBFUSCATOR ENGINE (CLIENT-SIDE) =====================
+
+  function _obfRandVar() {
+    const s = ['I','l','O','_'];
+    let n = s[Math.floor(Math.random()*s.length)];
+    for(let i=0;i<10+Math.floor(Math.random()*15);i++){
+      const c='IlO_'+(i>0?'10':'');
+      n+=c[Math.floor(Math.random()*c.length)];
+    }
+    return n+'_'+Math.random().toString(36).slice(2,6);
+  }
+
+  function _obfJunk(count) {
+    const lines=[];
+    for(let i=0;i<count;i++){
+      const v=_obfRandVar();
+      const t=Math.floor(Math.random()*4);
+      if(t===0) lines.push(`local ${v}=${Math.floor(Math.random()*999999)}`);
+      else if(t===1) lines.push(`local ${v}="${Math.random().toString(36).slice(2)}"`);
+      else if(t===2) lines.push(`local ${v}=string.rep("${String.fromCharCode(65+Math.floor(Math.random()*26))}",${Math.floor(Math.random()*50)})`);
+      else lines.push(`local ${v}=tostring(${Math.floor(Math.random()*99999)})`);
+    }
+    return lines.join('\n');
+  }
+
+  function _obfByteTable(code) {
+    const bytes=[];
+    for(let i=0;i<code.length;i++) bytes.push(code.charCodeAt(i));
+    const t=_obfRandVar(), r=_obfRandVar(), iv=_obfRandVar();
+    const chunks=[];
+    const cs=15+Math.floor(Math.random()*20);
+    for(let i=0;i<bytes.length;i+=cs) chunks.push(bytes.slice(i,i+cs).join(','));
+    return `local ${t}={${chunks.join(',\n')}}\nlocal ${r}={}\nfor ${iv}=1,#${t} do\n${r}[${iv}]=string.char(${t}[${iv}])\nend\nloadstring(table.concat(${r}))()`;
+  }
+
+  function _obfXor(code) {
+    const kl=32+Math.floor(Math.random()*33);
+    const key=[];
+    for(let i=0;i<kl;i++) key.push(1+Math.floor(Math.random()*254));
+    const enc=[];
+    for(let i=0;i<code.length;i++) enc.push(code.charCodeAt(i)^key[i%kl]);
+    const xf=_obfRandVar(),kv=_obfRandVar(),dv=_obfRandVar(),rv=_obfRandVar(),iv=_obfRandVar(),av=_obfRandVar(),bv=_obfRandVar(),rr=_obfRandVar(),pv=_obfRandVar();
+    return `local function ${xf}(${av},${bv})\nlocal ${rr},${pv}=0,1\nfor _=0,7 do\nlocal _a=math.floor(${av}/${pv})%2\nlocal _b=math.floor(${bv}/${pv})%2\nif _a~=_b then ${rr}=${rr}+${pv} end\n${pv}=${pv}*2\nend\nreturn ${rr}\nend\nlocal ${kv}={${key.join(',')}}\nlocal ${dv}={${enc.join(',')}}\nlocal ${rv}={}\nfor ${iv}=1,#${dv} do\n${rv}[${iv}]=string.char(${xf}(${dv}[${iv}],${kv}[((${iv}-1)%#${kv})+1]))\nend\nloadstring(table.concat(${rv}))()`;
+  }
+
+  function obfuscateLua(code) {
+    let r = _obfByteTable(code);
+    r = _obfJunk(3)+'\n'+r;
+    r = _obfXor(r);
+    r = _obfJunk(4)+'\n'+r;
+    r = _obfByteTable(r);
+    return '-- mohzzzz hub | protected script\n-- deobfuscation = ban\n'+_obfJunk(6)+'\n'+r;
+  }
+
+  // Preview obfuscated code for a script
+  window.previewObfuscated = async function(id) {
+    try {
+      const codeSnap = await getDoc(doc(db, "script_code", id));
+      if (!codeSnap.exists()) { showToast("Code not found","error"); return; }
+      const raw = codeSnap.data().code;
+      const obf = obfuscateLua(raw);
+      document.getElementById("obfOrigSize").textContent = "Original: " + raw.length + " chars";
+      document.getElementById("obfNewSize").textContent = "Obfuscated: " + obf.length + " chars";
+      document.getElementById("obfRatio").textContent = (obf.length/raw.length).toFixed(1) + "x expansion";
+      document.getElementById("obfPreviewCode").value = obf;
+      document.getElementById("obfModalOverlay").classList.add("active");
+    } catch(e) {
+      showToast("Error: " + e.message, "error");
+    }
+  };
+
+  window.copyObfuscated = function() {
+    const code = document.getElementById("obfPreviewCode").value;
+    navigator.clipboard.writeText(code);
+    showToast("Obfuscated code copied!", "success");
+  };
+
+  // ===================== ADMIN: KEYS =====================
+  let adminKeysUnsub = null;
+
+  function loadAdminKeys() {
+    if (adminKeysUnsub) return;
+    const q = query(collection(db, "keys"), orderBy("createdAt", "desc"));
+    adminKeysUnsub = onSnapshot(q, snapshot => {
+      const container = document.getElementById("adminKeysList");
+      container.innerHTML = "";
+
+      if (snapshot.empty) {
+        container.innerHTML = '<div class="empty-state">// no keys generated yet</div>';
+        return;
+      }
+
+      snapshot.forEach(docSnap => {
+        const d = docSnap.data();
+        container.appendChild(makeAdminKeyItem(docSnap.id, d));
+      });
+    });
+  }
+
+  function makeAdminKeyItem(id, d) {
+    const el = document.createElement("div");
+    el.className = "admin-key-item fade-in";
+
+    let statusClass = "key-active";
+    let statusText = "ACTIVE";
+
+    // Check expired
+    if (d.expiresAt) {
+      const exp = d.expiresAt.toDate ? d.expiresAt.toDate() : new Date(d.expiresAt);
+      if (exp < new Date()) {
+        statusClass = "key-expired";
+        statusText = "EXPIRED";
+      }
+    }
+    // Check max uses
+    if (d.maxUses > 0 && d.uses >= d.maxUses) {
+      statusClass = "key-used";
+      statusText = "USED UP";
+    }
+
+    const expiryStr = d.expiresAt
+      ? (d.expiresAt.toDate ? d.expiresAt.toDate().toLocaleDateString("en-US") : new Date(d.expiresAt).toLocaleDateString("en-US"))
+      : "Never";
+    const usesStr = d.maxUses > 0 ? `${d.uses || 0} / ${d.maxUses}` : `${d.uses || 0} / ∞`;
+    const truncKey = d.key ? (d.key.length > 20 ? d.key.substring(0, 20) + "…" : d.key) : "—";
+
+    el.innerHTML = `
+      <div class="admin-key-top">
+        <div>
+          <div class="admin-key-value">${escHtml(truncKey)}</div>
+          <div class="admin-key-meta">
+            Script: <span>${escHtml(d.scriptName || "—")}</span> · Uses: <span>${usesStr}</span> · Expires: <span>${expiryStr}</span>
+            ${d.notes ? ` · Notes: <span>${escHtml(d.notes)}</span>` : ""}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="key-status-badge ${statusClass}">${statusText}</span>
+          <button class="small-btn red" onclick="window.deleteKey('${id}')">DELETE</button>
+        </div>
+      </div>
+    `;
+    return el;
+  }
+
+  function updateScriptDropdown() {
+    const sel = document.getElementById("keyScriptSelect");
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— select script —</option>';
+    scriptsCache.forEach(s => {
+      sel.innerHTML += `<option value="${s._id}">${escHtml(s.name)} (${escHtml(s.game || "—")})</option>`;
+    });
+  }
+
+  window.generateKeys = async function() {
+    const scriptId = document.getElementById("keyScriptSelect").value;
+    const prefix = document.getElementById("keyPrefixInput").value.trim();
+    const count = parseInt(document.getElementById("keyCountInput").value) || 1;
+    const expiryVal = document.getElementById("keyExpiryInput").value;
+    const maxUses = parseInt(document.getElementById("keyMaxUsesInput").value) || 0;
+    const notes = document.getElementById("keyNotesInput").value.trim();
+    const btn = document.getElementById("generateKeysBtn");
+
+    if (!scriptId) { showToast("Select a script first", "error"); return; }
+    if (count < 1 || count > 100) { showToast("Count must be 1-100", "error"); return; }
+
+    // Find script name
+    const scriptData = scriptsCache.find(s => s._id === scriptId);
+    const scriptName = scriptData ? scriptData.name : "Unknown";
+
+    btn.disabled = true;
+    btn.textContent = "GENERATING...";
+
+    try {
+      const batch = writeBatch(db);
+      const generatedKeys = [];
+
+      for (let i = 0; i < count; i++) {
+        const key = generateRandomKey(prefix);
+        generatedKeys.push(key);
+        const ref = doc(collection(db, "keys"));
+        batch.set(ref, {
+          scriptId,
+          scriptName,
+          prefix: prefix || "",
+          key,
+          expiresAt: expiryVal ? new Date(expiryVal) : null,
+          maxUses,
+          uses: 0,
+          notes,
+          createdAt: serverTimestamp()
+        });
+      }
+
+      await batch.commit();
+      showToast(`${count} key(s) generated!`, "success");
+
+      // Show generated keys
+      const container = document.getElementById("generatedKeysContainer");
+      container.innerHTML = `
+        <div class="generated-keys-box fade-in">
+          <div style="font-size:10px;color:var(--green);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;font-weight:600;">✓ Generated ${count} key(s)</div>
+          ${generatedKeys.map(k => `
+            <div class="generated-key-row">
+              <span class="generated-key-val">${escHtml(k)}</span>
+              <button class="small-btn" onclick="window.copyToClipboard('${escHtml(k)}', this)">COPY</button>
+            </div>
+          `).join("")}
+          <div style="margin-top:12px;">
+            <button class="small-btn green" onclick="window.copyAllKeys(this)">COPY ALL</button>
+          </div>
+        </div>
+      `;
+      container._keys = generatedKeys;
+
+    } catch(e) {
+      showToast("Error: " + e.message, "error");
+    }
+
+    btn.disabled = false;
+    btn.textContent = "GENERATE KEYS";
+  };
+
+  window.copyAllKeys = function(btn) {
+    const container = document.getElementById("generatedKeysContainer");
+    const keys = container._keys || [];
+    copyToClipboard(keys.join("\n"), btn);
+  };
+
+  window.deleteKey = async function(id) {
+    if (!confirm("Delete this key?")) return;
+    try {
+      await deleteDoc(doc(db, "keys", id));
+      showToast("Key deleted", "success");
+    } catch(e) {
+      showToast("Error: " + e.message, "error");
+    }
+  };
+
+  // ===================== ADMIN SUB-TABS =====================
+  window.showAdminSubTab = function(tabName) {
+    document.querySelectorAll(".admin-sub-page").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".admin-subtab").forEach(t => t.classList.remove("active"));
+    const page = document.getElementById("admin-sub-" + tabName);
+    if (page) page.classList.add("active");
+    const tab = document.querySelector(`[data-admin-tab="${tabName}"]`);
+    if (tab) tab.classList.add("active");
+  };
+
+  // ===================== INIT =====================
+  window.addEventListener("load", () => {
+    loadPublicScripts();
+
+    // Enter key on redeem input
+    document.getElementById("redeemKeyInput")?.addEventListener("keydown", e => {
+      if (e.key === "Enter") { e.preventDefault(); window.validateKey(); }
+    });
+  });
+</script>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">SCRIPT HUB <span>· mohzzzz</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="scripts" onclick="showTab('scripts')">Scripts</button>
+      <button class="nav-tab" data-tab="redeem" onclick="showTab('redeem')">Redeem</button>
+      <button class="nav-tab admin-only" data-tab="admin" id="navTabAdmin" onclick="showTab('admin')" style="display:none;color:#3ca35c;">Admin</button>
+    </div>
+    <span id="adminBadge">ADMIN</span>
+    <span id="uidDisplay"></span>
+  </div>
+</nav>
+
+<!-- ==================== SCRIPTS PAGE ==================== -->
+<div class="page active" id="page-scripts">
+  <div class="page-header">
+    <div class="page-tag">// 01 — scripts</div>
+    <h1 class="page-title">Scripts</h1>
+    <p class="page-sub">Browse available scripts. Keyless scripts can be used directly.<br>Key-required scripts need a valid key from the Redeem section.</p>
+  </div>
+
+  <div class="grid-3" id="scriptsGrid">
+    <div class="empty-state">// loading scripts...</div>
+  </div>
+</div>
+
+<!-- ==================== REDEEM PAGE ==================== -->
+<div class="page" id="page-redeem">
+  <div class="page-header">
+    <div class="page-tag">// 02 — redeem</div>
+    <h1 class="page-title">Redeem Key</h1>
+    <p class="page-sub">Enter your key to validate it and get the loadstring.<br>Copy the code into your executor to run the script.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">// enter key</div>
+      <div class="form-group">
+        <label class="form-label">Script Key</label>
+        <input class="form-input" id="redeemKeyInput" placeholder="enter your key here..." maxlength="64" style="letter-spacing:.05em;">
+      </div>
+      <div id="redeemStatus" class="redeem-status waiting">// waiting for a key</div>
+      <button class="btn btn-primary" id="redeemBtn" onclick="window.validateKey()">VALIDATE</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">// result</div>
+      <div id="redeemResult">
+        <div class="empty-state">// enter a key and click validate</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADMIN PAGE ==================== -->
+<div class="page" id="page-admin">
+  <div class="page-header">
+    <div class="page-tag">// 03 — admin panel</div>
+    <h1 class="page-title">Admin</h1>
+  </div>
+
+  <div class="admin-panel">
+    <div class="admin-panel-title">// your firebase uid</div>
+    <div id="uidDisplayAdmin" style="font-size:10px;color:#3ca35c;word-break:break-all;"></div>
+  </div>
+
+  <div class="admin-subtabs">
+    <button class="admin-subtab active" data-admin-tab="scripts" onclick="showAdminSubTab('scripts')">Scripts</button>
+    <button class="admin-subtab" data-admin-tab="keys" onclick="showAdminSubTab('keys')">Keys</button>
+  </div>
+
+  <!-- ADMIN > SCRIPTS -->
+  <div class="admin-sub-page active" id="admin-sub-scripts">
+    <div class="page-tag" style="margin-bottom:16px;">// 03 — manage scripts</div>
+    <div style="margin-bottom:20px;">
+      <button class="btn btn-green" onclick="window.showScriptModal()">+ ADD SCRIPT</button>
+    </div>
+    <div id="adminScriptsList">
+      <div class="empty-state">// loading...</div>
+    </div>
+  </div>
+
+  <!-- ADMIN > KEYS -->
+  <div class="admin-sub-page" id="admin-sub-keys">
+    <div class="page-tag" style="margin-bottom:16px;">// 04 — manage keys</div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-title">// generate keys</div>
+      <div class="grid-2" style="margin-bottom:12px;">
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Script</label>
+          <select class="form-input form-select" id="keyScriptSelect">
+            <option value="">— select script —</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Prefix (optional)</label>
+          <input class="form-input" id="keyPrefixInput" placeholder="e.g. VIP" maxlength="10">
+        </div>
+      </div>
+      <div class="grid-2" style="margin-bottom:12px;">
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Count (how many)</label>
+          <input class="form-input" id="keyCountInput" type="number" value="1" min="1" max="100">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Max Uses (0 = unlimited)</label>
+          <input class="form-input" id="keyMaxUsesInput" type="number" value="0" min="0">
+        </div>
+      </div>
+      <div class="grid-2" style="margin-bottom:12px;">
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Expiry Date (leave empty = never)</label>
+          <input class="form-input" id="keyExpiryInput" type="date">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Notes (optional)</label>
+          <input class="form-input" id="keyNotesInput" placeholder="internal note..." maxlength="100">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="generateKeysBtn" onclick="window.generateKeys()">GENERATE KEYS</button>
+      <div id="generatedKeysContainer"></div>
+    </div>
+
+    <div class="card-title" style="margin-bottom:12px;">// all keys</div>
+    <div id="adminKeysList">
+      <div class="empty-state">// loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPT MODAL -->
+<div class="modal-overlay" id="scriptModalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="window.closeScriptModal()">✕</button>
+    <div class="modal-title" id="scriptModalTitle">Add Script</div>
+
+    <div class="form-group">
+      <label class="form-label">Script Name</label>
+      <input class="form-input" id="scriptNameInput" placeholder="e.g. Auto Farm Script" maxlength="80">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Game</label>
+      <input class="form-input" id="scriptGameInput" placeholder="e.g. Blox Fruits" maxlength="80">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Code</label>
+      <textarea class="code-textarea" id="scriptCodeInput" placeholder="-- paste your Lua code here..."></textarea>
+    </div>
+    <div class="form-group">
+      <div class="toggle-wrap">
+        <label class="toggle">
+          <input type="checkbox" id="scriptKeylessToggle">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label">Keyless (no key required)</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-primary" id="scriptSaveBtn" onclick="window.saveScript()">ADD SCRIPT</button>
+      <button class="btn" onclick="window.closeScriptModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- OBFUSCATION PREVIEW MODAL -->
+<div class="modal-overlay" id="obfModalOverlay">
+  <div class="modal" style="max-width:750px;">
+    <button class="modal-close" onclick="document.getElementById('obfModalOverlay').classList.remove('active')">✕</button>
+    <div class="modal-title">🔒 Obfuscated Preview</div>
+    <div style="font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">this is what players receive when they loadstring your script</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <span id="obfOrigSize" class="badge" style="background:rgba(60,163,92,.1);color:var(--green);"></span>
+      <span id="obfNewSize" class="badge" style="background:rgba(139,92,246,.15);color:#a78bfa;"></span>
+      <span id="obfRatio" class="badge" style="background:rgba(255,255,255,.05);color:var(--dim);"></span>
+    </div>
+    <textarea class="code-textarea" id="obfPreviewCode" readonly style="min-height:350px;color:#a78bfa;font-size:10px;cursor:default;"></textarea>
+    <div style="display:flex;gap:10px;margin-top:12px;">
+      <button class="btn btn-primary" style="background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.4);" onclick="window.copyObfuscated()">COPY OBFUSCATED</button>
+      <button class="btn" onclick="document.getElementById('obfModalOverlay').classList.remove('active')">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FOOTER -->
+<div class="site-footer">mohzzzz script hub • powered by firebase</div>
+
+<script>
+  // Sync admin UID display
+  const obs = new MutationObserver(() => {
+    const uid = document.getElementById("uidDisplay")?.textContent;
+    const adminUid = document.getElementById("uidDisplayAdmin");
+    if (uid && adminUid) adminUid.textContent = uid.replace("UID: ","");
+  });
+  obs.observe(document.getElementById("uidDisplay"), { childList:true, characterData:true, subtree:true });
+
+  // Close modal on overlay click
+  document.getElementById("scriptModalOverlay").addEventListener("click", function(e) {
+    if (e.target === this) window.closeScriptModal();
+  });
+
+  // Close modal on Escape
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") window.closeScriptModal();
+  });
+</script>
+
+</body>
+</html>

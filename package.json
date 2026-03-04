@@ -1,0 +1,10 @@
+{
+  "name": "mohzzzz-script-hub",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "mkdir -p public && cp index.html public/index.html"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}
